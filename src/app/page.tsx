@@ -29,8 +29,9 @@ export default async function LandingPage() {
             <span className="font-serif text-[22px] font-bold tracking-tight" style={{ color: "#1A1A1A" }}>Cactus Labs</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#manifesto" className="transition-colors text-[15px] font-medium hidden sm:block" style={{ color: "#6B6B6B" }}>Manifesto</a>
-            <a href="#funcionalidades" className="transition-colors text-[15px] font-medium hidden sm:block" style={{ color: "#6B6B6B" }}>Funcionalidades</a>
+            <a href="#manifesto" className="transition-colors text-[15px] font-medium hidden sm:block hover:text-[#1A1A1A]" style={{ color: "#6B6B6B" }}>Manifesto</a>
+            <a href="#funcionalidades" className="transition-colors text-[15px] font-medium hidden sm:block hover:text-[#1A1A1A]" style={{ color: "#6B6B6B" }}>Funcionalidades</a>
+            <a href="#planos" className="transition-colors text-[15px] font-medium hidden sm:block hover:text-[#1A1A1A]" style={{ color: "#6B6B6B" }}>Planos</a>
             <LoginButton className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-2.5 rounded-full text-[15px] font-medium hover:bg-black transition-colors shadow-sm cursor-pointer">
               Entrar com GitHub
             </LoginButton>

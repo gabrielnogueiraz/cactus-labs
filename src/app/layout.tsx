@@ -17,7 +17,7 @@ const libreBaskerville = Libre_Baskerville({
 });
 
 export const metadata: Metadata = {
-  title: "Cactus Labs 🌵 — GitHub Performance Dashboard",
+  title: "Cactus Labs",
   description:
     "Analyze your GitHub performance with AI-powered insights, detailed metrics, and exportable reports.",
   icons: {
@@ -32,7 +32,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${inter.variable} ${libreBaskerville.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${libreBaskerville.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
