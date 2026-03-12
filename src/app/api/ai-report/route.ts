@@ -30,13 +30,13 @@ function getPeriodDate(period: TimePeriod): string {
 function getPeriodLabel(period: TimePeriod): string {
   switch (period) {
     case "7d":
-      return "Last 7 days";
+      return "Últimos 7 dias";
     case "30d":
-      return "Last 30 days";
+      return "Últimos 30 dias";
     case "90d":
-      return "Last 90 days";
+      return "Últimos 90 dias";
     case "1y":
-      return "Last year";
+      return "Último ano";
   }
 }
 
@@ -79,7 +79,8 @@ export async function POST(request: Request) {
     const report = await analyzePerformance(
       commits,
       pullRequests,
-      getPeriodLabel(period)
+      getPeriodLabel(period),
+      user.login,
     );
 
     return NextResponse.json({ report });

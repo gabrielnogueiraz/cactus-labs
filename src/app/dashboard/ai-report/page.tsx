@@ -20,15 +20,74 @@ import {
   Code2,
   Target,
   TrendingUp,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Lightbulb,
 } from "lucide-react";
 import type { AIReportData, TimePeriod } from "@/types/github";
 import { generateReportPDF } from "@/lib/export/pdf";
+
+// ---------------------------------------------------------------------------
+// Score progress bar component
+// ---------------------------------------------------------------------------
+
+function ScoreBar({
+  label,
+  nota,
+  justificativa,
+}: {
+  label: string;
+  nota: number;
+  justificativa: string;
+}) {
+  const pct = Math.min(nota, 10) * 10;
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-foreground">{label}</span>
+        <span className="text-sm font-bold text-cactus">{nota}/10</span>
+      </div>
+      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+        <div
+          className="h-full rounded-full bg-cactus transition-all duration-700 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">{justificativa}</p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Priority badge
+// ---------------------------------------------------------------------------
+
+function PriorityBadge({ p }: { p: string }) {
+  const colorMap: Record<string, string> = {
+    Alta: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+    Média:
+      "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+    Baixa:
+      "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  };
+  return (
+    <Badge className={`rounded-full border-0 text-xs ${colorMap[p] ?? ""}`}>
+      {p}
+    </Badge>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main page
+// ---------------------------------------------------------------------------
 
 export default function AIReportPage() {
   const [period, setPeriod] = useState<TimePeriod>("30d");
   const [report, setReport] = useState<AIReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [padroesOpen, setPadroesOpen] = useState(false);
 
   const generateReport = async () => {
     setIsLoading(true);
@@ -180,87 +239,293 @@ export default function AIReportPage() {
           </div>
 
           {/* Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <Card className="border border-border bg-card rounded-xl">
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-cactus">
-                  {report.metrics.total_commits}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Commits</p>
-              </CardContent>
-            </Card>
-            <Card className="border border-border bg-card rounded-xl">
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-cactus">
-                  {report.metrics.total_prs}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Pull Requests
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border border-border bg-card rounded-xl">
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-cactus">
-                  {report.metrics.repos_contributed}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Repositórios</p>
-              </CardContent>
-            </Card>
-          </div>
+          {report._meta && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <Card className="border border-border bg-card rounded-xl">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-cactus">
+                    {report._meta.total_commits}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Commits</p>
+                </CardContent>
+              </Card>
+              <Card className="border border-border bg-card rounded-xl">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-cactus">
+                    {report._meta.total_prs}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Pull Requests
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border border-border bg-card rounded-xl">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-cactus">
+                    {report._meta.repos_contributed}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Repositórios
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border border-border bg-card rounded-xl">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-cactus">
+                    {report._meta.media_semanal}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Commits/semana
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-          {/* Summary */}
+          {/* Resumo Executivo — 3 paragraphs */}
           <Card className="border border-border bg-card rounded-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-5 h-5 text-cactus" />
                 <h3 className="text-lg font-semibold text-foreground">
-                  Resumo de Performance
+                  Resumo Executivo
                 </h3>
               </div>
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                {report.summary.split("\n").map((paragraph, i) => (
-                  <p
-                    key={i}
-                    className="text-sm text-foreground/90 leading-relaxed mb-3"
-                  >
-                    {paragraph}
+              <div className="space-y-3">
+                {report.resumo_executivo.o_que_foi_construido && (
+                  <p className="text-sm text-foreground/90 leading-relaxed">
+                    {report.resumo_executivo.o_que_foi_construido}
                   </p>
-                ))}
+                )}
+                {report.resumo_executivo.padroes_de_comportamento && (
+                  <p className="text-sm text-foreground/90 leading-relaxed">
+                    {report.resumo_executivo.padroes_de_comportamento}
+                  </p>
+                )}
+                {report.resumo_executivo.avaliacao_de_maturidade && (
+                  <p className="text-sm text-foreground/90 leading-relaxed">
+                    {report.resumo_executivo.avaliacao_de_maturidade}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Highlights */}
-          {report.highlights.length > 0 && (
+          {/* Destaques — cards with title, description, evidence badge */}
+          {report.destaques.length > 0 && (
             <Card className="border border-border bg-card rounded-xl">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-cactus" />
                   <h3 className="text-lg font-semibold text-foreground">
-                    Principais Destaques
+                    Destaques
                   </h3>
                 </div>
-                <ul className="space-y-3">
-                  {report.highlights.map((highlight, i) => (
-                    <li
+                <div className="space-y-4">
+                  {report.destaques.map((d, i) => (
+                    <div
                       key={i}
-                      className="flex items-start gap-3 text-sm text-foreground/90"
+                      className="rounded-lg bg-muted/40 p-4 space-y-2"
                     >
-                      <span className="w-6 h-6 rounded-full bg-cactus-soft dark:bg-cactus/10 flex items-center justify-center text-xs font-bold text-cactus shrink-0 mt-0.5">
-                        {i + 1}
-                      </span>
-                      {highlight}
-                    </li>
+                      <h4 className="text-sm font-semibold text-foreground">
+                        {d.titulo}
+                      </h4>
+                      <p className="text-sm text-foreground/80">{d.descricao}</p>
+                      {d.impacto_inferido && (
+                        <p className="text-xs text-muted-foreground">
+                          Impacto: {d.impacto_inferido}
+                        </p>
+                      )}
+                      {d.evidencia && (
+                        <Badge
+                          variant="secondary"
+                          className="rounded-full bg-cactus-soft dark:bg-cactus/10 text-cactus border-0 text-xs"
+                        >
+                          {d.evidencia}
+                        </Badge>
+                      )}
+                    </div>
                   ))}
-                </ul>
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Technologies & Impact */}
+          {/* Pontos Críticos — alert-style cards */}
+          {report.pontos_criticos.length > 0 && (
+            <Card className="border border-border bg-card rounded-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Pontos Críticos
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {report.pontos_criticos.map((pc, i) => (
+                    <div
+                      key={i}
+                      className="rounded-lg border-l-4 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 p-4 space-y-2"
+                    >
+                      <p className="text-sm font-medium text-foreground">
+                        {pc.observacao}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {pc.evidencia}
+                      </p>
+                      <p className="text-xs text-foreground/80">
+                        <span className="font-semibold">Recomendação:</span>{" "}
+                        {pc.recomendacao}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Scores — 4 progress bars */}
+          <Card className="border border-border bg-card rounded-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <BarChart3 className="w-5 h-5 text-cactus" />
+                <h3 className="text-lg font-semibold text-foreground">
+                  Scores
+                </h3>
+              </div>
+              <div className="space-y-5">
+                <ScoreBar
+                  label="Produtividade"
+                  nota={report.scores.produtividade.nota}
+                  justificativa={report.scores.produtividade.justificativa}
+                />
+                <ScoreBar
+                  label="Consistência"
+                  nota={report.scores.consistencia.nota}
+                  justificativa={report.scores.consistencia.justificativa}
+                />
+                <ScoreBar
+                  label="Amplitude Técnica"
+                  nota={report.scores.amplitude_tecnica.nota}
+                  justificativa={report.scores.amplitude_tecnica.justificativa}
+                />
+                <ScoreBar
+                  label="Qualidade Inferida"
+                  nota={report.scores.qualidade_inferida.nota}
+                  justificativa={report.scores.qualidade_inferida.justificativa}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Padrões Identificados — collapsible */}
+          <Card className="border border-border bg-card rounded-xl">
+            <CardContent className="p-6">
+              <button
+                onClick={() => setPadroesOpen(!padroesOpen)}
+                className="w-full flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-cactus" />
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Padrões Identificados
+                  </h3>
+                </div>
+                {padroesOpen ? (
+                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                )}
+              </button>
+              {padroesOpen && (
+                <div className="mt-4 space-y-4">
+                  {report.padroes_identificados.ritmo_de_trabalho && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground mb-1">
+                        Ritmo de Trabalho
+                      </h4>
+                      <p className="text-sm text-foreground/80">
+                        {report.padroes_identificados.ritmo_de_trabalho}
+                      </p>
+                    </div>
+                  )}
+                  {report.padroes_identificados.foco_tecnico && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground mb-1">
+                        Foco Técnico
+                      </h4>
+                      <p className="text-sm text-foreground/80">
+                        {report.padroes_identificados.foco_tecnico}
+                      </p>
+                    </div>
+                  )}
+                  {report.padroes_identificados.lacunas && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground mb-1">
+                        Lacunas
+                      </h4>
+                      <p className="text-sm text-foreground/80">
+                        {report.padroes_identificados.lacunas}
+                      </p>
+                    </div>
+                  )}
+                  {report.padroes_identificados.evolucao_no_periodo && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground mb-1">
+                        Evolução no Período
+                      </h4>
+                      <p className="text-sm text-foreground/80">
+                        {report.padroes_identificados.evolucao_no_periodo}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recomendações — sorted by priority */}
+          {report.recomendacoes.length > 0 && (
+            <Card className="border border-border bg-card rounded-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="w-5 h-5 text-cactus" />
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Recomendações
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  {[...report.recomendacoes]
+                    .sort((a, b) => {
+                      const order: Record<string, number> = {
+                        Alta: 0,
+                        Média: 1,
+                        Baixa: 2,
+                      };
+                      return (order[a.prioridade] ?? 2) - (order[b.prioridade] ?? 2);
+                    })
+                    .map((r, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 border-b border-border/50 pb-3 last:border-0 last:pb-0"
+                      >
+                        <PriorityBadge p={r.prioridade} />
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm text-foreground">{r.acao}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {r.justificativa}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Technologies & Impact Areas */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {report.technologies.length > 0 && (
+            {report.tecnologias.length > 0 && (
               <Card className="border border-border bg-card rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
@@ -270,7 +535,7 @@ export default function AIReportPage() {
                     </h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {report.technologies.map((tech) => (
+                    {report.tecnologias.map((tech) => (
                       <Badge
                         key={tech}
                         variant="secondary"
@@ -284,7 +549,7 @@ export default function AIReportPage() {
               </Card>
             )}
 
-            {report.impact_areas.length > 0 && (
+            {report.areas_de_impacto.length > 0 && (
               <Card className="border border-border bg-card rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
@@ -294,7 +559,7 @@ export default function AIReportPage() {
                     </h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {report.impact_areas.map((area) => (
+                    {report.areas_de_impacto.map((area) => (
                       <Badge
                         key={area}
                         variant="outline"
@@ -312,7 +577,7 @@ export default function AIReportPage() {
           {/* Footer */}
           <div className="text-center py-4">
             <p className="text-xs text-muted-foreground">
-              🌵 Gerado pela IA do Cactus Labs •{" "}
+              Gerado pela IA do Cactus Labs •{" "}
               {new Date().toLocaleDateString("pt-BR", {
                 year: "numeric",
                 month: "long",
