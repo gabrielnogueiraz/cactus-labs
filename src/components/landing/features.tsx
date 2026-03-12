@@ -64,13 +64,16 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section className="py-32 bg-landing-bg">
+    <section className="py-32" style={{ backgroundColor: "#F5F4EF" }}>
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <h2 className="font-serif text-[42px] font-bold text-landing-text tracking-[-0.01em] leading-tight mb-4">
+          <h2
+            className="font-serif text-[42px] font-bold tracking-[-0.01em] leading-tight mb-4"
+            style={{ color: "#1A1A1A" }}
+          >
             Funcionalidades feitas para quem constrói.
           </h2>
-          <p className="text-landing-text-muted text-[17px] leading-relaxed">
+          <p className="text-[17px] leading-relaxed" style={{ color: "#6B6B6B" }}>
             Todas as métricas que importam, organizadas do jeito certo.
           </p>
         </div>
@@ -80,15 +83,13 @@ export function Features() {
             const Icon = feature.icon;
             return (
               <div key={index} className="flex flex-col items-center text-center">
-                <div
-                  className={`w-[50px] h-[50px] rounded-full flex items-center justify-center mb-6 ${feature.color}`}
-                >
+                <div className={`w-[50px] h-[50px] rounded-full flex items-center justify-center mb-6 ${feature.color}`}>
                   <Icon className="w-6 h-6" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-serif text-[18px] font-bold text-landing-text mb-3">
+                <h3 className="font-serif text-[18px] font-bold mb-3" style={{ color: "#1A1A1A" }}>
                   {feature.title}
                 </h3>
-                <p className="text-[14px] text-landing-text-muted leading-relaxed font-sans">
+                <p className="text-[14px] leading-relaxed font-sans" style={{ color: "#6B6B6B" }}>
                   {feature.description}
                 </p>
               </div>
