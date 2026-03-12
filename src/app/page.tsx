@@ -21,17 +21,17 @@ export default async function LandingPage() {
   }
 
   return (
-    <main className="light bg-landing-page min-h-screen text-landing-text font-sans selection:bg-landing-accent/20">
+    <main style={{ backgroundColor: "#F5F4EF", minHeight: "100vh", color: "#1A1A1A" }} className="font-sans">
       <nav className="absolute top-0 left-0 right-0 z-50 bg-transparent">
         <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-[28px] leading-none">🌵</span>
-            <span className="font-serif text-[22px] font-bold tracking-tight text-landing-text">Cactus Labs</span>
+            <span className="font-serif text-[22px] font-bold tracking-tight" style={{ color: "#1A1A1A" }}>Cactus Labs</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#manifesto" className="text-landing-text-muted hover:text-landing-text transition-colors text-[15px] font-medium hidden sm:block">Manifesto</a>
-            <a href="#funcionalidades" className="text-landing-text-muted hover:text-landing-text transition-colors text-[15px] font-medium hidden sm:block">Funcionalidades</a>
-            <LoginButton className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-2.5 rounded-full text-[15px] font-medium hover:bg-black transition-colors shadow-sm">
+            <a href="#manifesto" className="transition-colors text-[15px] font-medium hidden sm:block" style={{ color: "#6B6B6B" }}>Manifesto</a>
+            <a href="#funcionalidades" className="transition-colors text-[15px] font-medium hidden sm:block" style={{ color: "#6B6B6B" }}>Funcionalidades</a>
+            <LoginButton className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-2.5 rounded-full text-[15px] font-medium hover:bg-black transition-colors shadow-sm cursor-pointer">
               Entrar com GitHub
             </LoginButton>
           </div>
