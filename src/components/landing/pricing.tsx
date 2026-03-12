@@ -1,65 +1,50 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
+import { LoginButton } from "@/components/landing/login-button";
 
 export function Pricing() {
-  const handleLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: "read:user repo read:org",
-      },
-    });
-  };
-
   return (
-    <section className="py-32 px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Quanto custa?
-          </h2>
-        </div>
+    <section className="py-32 bg-landing-bg">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+        <h2 className="font-serif text-[48px] font-bold text-landing-text tracking-[-0.01em] mb-16">
+          Quanto custa?
+        </h2>
 
-        <div className="max-w-md mx-auto border border-border bg-card rounded-2xl p-8 sm:p-10 shadow-sm text-center">
-          <div className="mb-6">
-            <span className="text-5xl sm:text-6xl font-bold text-foreground tracking-tight">R$ 0,00</span>
+        <div className="max-w-[420px] mx-auto bg-landing-surface rounded-2xl border border-landing-border shadow-[0_8px_32px_rgba(0,0,0,0.04)] p-10 relative">
+          <div className="mb-8">
+            <span className="font-serif text-[72px] font-bold text-landing-text leading-none block mb-3">
+              R$ 0,00
+            </span>
+            <p className="font-sans text-[15px] text-landing-text-muted font-medium">
+              Para sempre. Sem pegadinhas.
+            </p>
           </div>
-          <p className="text-lg text-muted-foreground mb-8">
-            Para sempre. Sem pegadinhas.
-          </p>
 
-          <ul className="space-y-4 text-left mb-10">
-            <li className="flex items-center gap-3">
-              <div className="shrink-0 w-6 h-6 rounded-full bg-cactus/10 flex items-center justify-center">
-                <Check className="w-4 h-4 text-cactus" />
-              </div>
-              <span className="text-foreground">Acesso completo a todas as funcionalidades</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <div className="shrink-0 w-6 h-6 rounded-full bg-cactus/10 flex items-center justify-center">
-                <Check className="w-4 h-4 text-cactus" />
-              </div>
-              <span className="text-foreground">Relatórios ilimitados com IA</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <div className="shrink-0 w-6 h-6 rounded-full bg-cactus/10 flex items-center justify-center">
-                <Check className="w-4 h-4 text-cactus" />
-              </div>
-              <span className="text-foreground">Exportação em PDF e Excel</span>
-            </li>
+          <div className="h-px bg-landing-border/60 w-full mb-8" />
+
+          <ul className="flex flex-col gap-4 text-left mb-10">
+            {[
+              "Acesso completo a todas as funcionalidades",
+              "Relatórios ilimitados com IA",
+              "Exportação em PDF e Excel",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <div className="mt-1 flex-shrink-0 text-landing-accent">
+                  <Check className="w-[18px] h-[18px] stroke-[3]" />
+                </div>
+                <span className="font-sans text-[15px] text-landing-text-muted leading-relaxed">
+                  {item}
+                </span>
+              </li>
+            ))}
           </ul>
 
-          <Button 
-            onClick={handleLogin}
-            className="w-full bg-foreground hover:bg-foreground/90 text-background rounded-xl py-6 text-base"
+          <LoginButton
+            className="w-full flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium py-3.5 rounded-xl transition-colors shadow-sm"
           >
-            Começar agora
-          </Button>
+            Criar uma conta
+          </LoginButton>
         </div>
       </div>
     </section>

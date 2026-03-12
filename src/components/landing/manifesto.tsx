@@ -1,26 +1,30 @@
 export function Manifesto() {
   return (
-    <section className="py-32 px-6 bg-[#F9FAFB]">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-12">
+    <section className="bg-landing-manifesto py-24 border-y border-landing-border/50">
+      <div className="max-w-[680px] mx-auto px-6 text-center">
+        <h2 className="font-serif text-[42px] font-bold text-landing-text mb-12 tracking-[-0.01em]">
           Por que o Cactus Labs existe
         </h2>
         
-        <div className="space-y-8 font-serif text-lg sm:text-xl text-foreground/90 leading-relaxed">
+        <div className="flex flex-col gap-6 text-left sm:text-center text-[#2D2D2D] font-serif text-[18px] leading-[1.8]">
           <p>
-            O Cactus Labs nasceu de uma frustração real. No final do ano, chega a hora de apresentar resultados para a diretoria — e o desenvolvedor precisa vasculhar históricos de commits, pull requests e repositórios espalhados para montar um relatório que deveria ser automático.
+            No final do ano, chega a hora de apresentar resultados.<br className="hidden sm:block" />
+            E o desenvolvedor precisa vasculhar commits, pull requests e repositórios<br className="hidden sm:block" />
+            espalhados para montar um relatório que deveria ser automático.
           </p>
           <p>
-            Criado por Gabriel Nogueira, desenvolvedor fullstack especializado em automação de processos contábeis, o Cactus Labs é a ferramenta que ele queria ter encontrado: um dashboard que centraliza sua atividade no GitHub, analisa seu impacto com IA e gera relatórios prontos para apresentar.
+            O Cactus Labs nasceu dessa frustração. Uma ferramenta simples, honesta,<br className="hidden sm:block" />
+            que centraliza sua atividade no GitHub, analisa seu impacto com IA<br className="hidden sm:block" />
+            e gera relatórios prontos para apresentar.
           </p>
-          <p className="font-bold">
-            Simples. Honesto. Feito para quem constrói.
+          <p>
+            Feito por um desenvolvedor, para desenvolvedores.
           </p>
         </div>
-
-        <div className="mt-16 pt-8 border-t border-border">
-          <p className="italic text-muted-foreground">— Gabriel Nogueira, criador</p>
-        </div>
+        
+        <p className="font-sans text-[14px] italic text-landing-text-muted mt-10 text-center">
+          — Gabriel Nogueira, criador do Cactus Labs
+        </p>
       </div>
     </section>
   );

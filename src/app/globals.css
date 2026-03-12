@@ -49,6 +49,20 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-landing-bg: #F5F4EF;
+  --color-landing-surface: #FFFFFF;
+  --color-landing-border: #E8E6DF;
+  --color-landing-text: #1A1A1A;
+  --color-landing-text-muted: #6B6B6B;
+  --color-landing-accent: #16A34A;
+  --color-landing-accent-soft: #DCFCE7;
+  --color-landing-manifesto: #EDECEA;
+}
+
+@layer utilities {
+  .bg-landing-page {
+    background-color: #F5F4EF !important;
+  }
 }
 
 :root {

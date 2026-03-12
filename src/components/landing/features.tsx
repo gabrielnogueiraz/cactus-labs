@@ -1,63 +1,99 @@
-import {
-  BarChart3,
-  BrainCircuit,
-  FileDown,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+"use client";
 
-const features = [
+import {
+  GitCommitHorizontal,
+  GitPullRequest,
+  BarChart2,
+  Sparkles,
+  Building2,
+  FileDown,
+  Calendar,
+  Lock,
+} from "lucide-react";
+
+const FEATURES = [
   {
-    icon: BarChart3,
-    title: "Métricas Ricas",
-    description:
-      "Frequência de commits, velocidade de PRs, heatmaps de contribuição e mais. Veja seus padrões de código ganharem vida com gráficos bonitos.",
+    icon: GitCommitHorizontal,
+    title: "Commits Detalhados",
+    description: "Visualize todos os commits por repositório, data e mensagem. Filtre e busque no histórico completo.",
+    color: "bg-[#DCFCE7] text-[#16A34A]",
   },
   {
-    icon: BrainCircuit,
-    title: "Análise com Inteligência Artificial",
-    description:
-      "Receba relatórios de performance personalizados gerados por IA. Entenda seus pontos fortes, áreas de foco e trajetória de crescimento.",
+    icon: GitPullRequest,
+    title: "Pull Requests",
+    description: "Acompanhe PRs abertos, merged e fechados com status em tempo real.",
+    color: "bg-[#DBEAFE] text-[#2563EB]",
+  },
+  {
+    icon: BarChart2,
+    title: "Métricas Visuais",
+    description: "Gráficos de atividade, heatmap de contribuições e evolução ao longo do tempo.",
+    color: "bg-[#FEF9C3] text-[#CA8A04]",
+  },
+  {
+    icon: Sparkles,
+    title: "Análise com IA",
+    description: "Inteligência artificial analisa seus commits e gera narrativas de impacto real.",
+    color: "bg-[#F3E8FF] text-[#9333EA]",
+  },
+  {
+    icon: Building2,
+    title: "Organizações",
+    description: "Suporte completo a orgs do GitHub — veja sua atividade em todos os contextos.",
+    color: "bg-[#FCE7F3] text-[#DB2777]",
   },
   {
     icon: FileDown,
-    title: "Exporte para Qualquer Lugar",
-    description:
-      "Baixe seus relatórios em PDFs refinados ou exporte dados brutos para o Excel. Perfeito para avaliações de desempenho e portfólios.",
+    title: "Exportação",
+    description: "Exporte relatórios em PDF ou Excel para apresentar aos seus líderes.",
+    color: "bg-[#FFEDD5] text-[#EA580C]",
+  },
+  {
+    icon: Calendar,
+    title: "Filtros por Período",
+    description: "Semana, mês, trimestre ou ano. Você escolhe o recorte temporal.",
+    color: "bg-[#DCFCE7] text-[#16A34A]",
+  },
+  {
+    icon: Lock,
+    title: "Seguro e Privado",
+    description: "Seus dados ficam na sua conta. Nunca compartilhamos informações com terceiros.",
+    color: "bg-[#F3F4F6] text-[#4B5563]",
   },
 ];
 
 export function Features() {
   return (
-    <section className="py-32 px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Tudo o que você precisa para <span className="text-cactus">entender</span> seu código
+    <section className="py-32 bg-landing-bg">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <h2 className="font-serif text-[42px] font-bold text-landing-text tracking-[-0.01em] leading-tight mb-4">
+            Funcionalidades feitas para quem constrói.
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Um kit de ferramentas completo para desenvolvedores que desejam medir, analisar e apresentar seu trabalho de engenharia.
+          <p className="text-landing-text-muted text-[17px] leading-relaxed">
+            Todas as métricas que importam, organizadas do jeito certo.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <Card
-              key={feature.title}
-              className="group border border-border bg-card hover:border-cactus/30 transition-all duration-200 rounded-xl"
-            >
-              <CardContent className="p-8">
-                <div className="w-12 h-12 rounded-lg bg-cactus-soft flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
-                  <feature.icon className="w-6 h-6 text-cactus" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          {FEATURES.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div key={index} className="flex flex-col items-center text-center">
+                <div
+                  className={`w-[50px] h-[50px] rounded-full flex items-center justify-center mb-6 ${feature.color}`}
+                >
+                  <Icon className="w-6 h-6" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-serif text-xl font-bold text-foreground mb-3">
+                <h3 className="font-serif text-[18px] font-bold text-landing-text mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-[14px] text-landing-text-muted leading-relaxed font-sans">
                   {feature.description}
                 </p>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

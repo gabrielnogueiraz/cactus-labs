@@ -3,8 +3,12 @@ import { Features } from "@/components/landing/features";
 import { Footer } from "@/components/landing/footer";
 import { Manifesto } from "@/components/landing/manifesto";
 import { Pricing } from "@/components/landing/pricing";
+import { Showcase } from "@/components/landing/showcase";
+import { SocialProof } from "@/components/landing/social-proof";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { LoginButton } from "@/components/landing/login-button";
+import { Github } from "lucide-react";
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -17,22 +21,34 @@ export default async function LandingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+    <main className="light bg-landing-page min-h-screen text-landing-text font-sans selection:bg-landing-accent/20">
+      <nav className="absolute top-0 left-0 right-0 z-50 bg-transparent">
+        <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🌵</span>
-            <span className="font-serif text-xl font-bold text-foreground pt-1">Cactus Labs</span>
+            <span className="text-[28px] leading-none">🌵</span>
+            <span className="font-serif text-[22px] font-bold tracking-tight text-landing-text">Cactus Labs</span>
+          </div>
+          <div className="flex items-center gap-8">
+            <a href="#manifesto" className="text-landing-text-muted hover:text-landing-text transition-colors text-[15px] font-medium hidden sm:block">Manifesto</a>
+            <a href="#funcionalidades" className="text-landing-text-muted hover:text-landing-text transition-colors text-[15px] font-medium hidden sm:block">Funcionalidades</a>
+            <LoginButton className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-2.5 rounded-full text-[15px] font-medium hover:bg-black transition-colors shadow-sm">
+              Entrar com GitHub
+            </LoginButton>
           </div>
         </div>
       </nav>
-      <div className="pt-20">
-        <Hero />
-        <Manifesto />
+      
+      <Hero />
+      <SocialProof />
+      <div id="funcionalidades">
         <Features />
-        <Pricing />
-        <Footer />
+        <Showcase />
       </div>
+      <div id="manifesto">
+        <Manifesto />
+      </div>
+      <Pricing />
+      <Footer />
     </main>
   );
 }
