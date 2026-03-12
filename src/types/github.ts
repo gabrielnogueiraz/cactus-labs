@@ -113,18 +113,60 @@ export interface HeatmapDay {
   level: 0 | 1 | 2 | 3 | 4;
 }
 
+export interface ScoreItem {
+  nota: number;
+  justificativa: string;
+}
+
 export interface AIReportData {
-  summary: string;
-  highlights: string[];
-  technologies: string[];
-  impact_areas: string[];
-  metrics: {
+  resumo_executivo: {
+    o_que_foi_construido: string;
+    padroes_de_comportamento: string;
+    avaliacao_de_maturidade: string;
+  };
+
+  destaques: Array<{
+    titulo: string;
+    descricao: string;
+    impacto_inferido: string;
+    evidencia: string;
+  }>;
+
+  pontos_criticos: Array<{
+    observacao: string;
+    evidencia: string;
+    recomendacao: string;
+  }>;
+
+  padroes_identificados: {
+    ritmo_de_trabalho: string;
+    foco_tecnico: string;
+    lacunas: string;
+    evolucao_no_periodo: string;
+  };
+
+  tecnologias: string[];
+  areas_de_impacto: string[];
+
+  recomendacoes: Array<{
+    prioridade: "Alta" | "Média" | "Baixa";
+    acao: string;
+    justificativa: string;
+  }>;
+
+  scores: {
+    produtividade: ScoreItem;
+    consistencia: ScoreItem;
+    amplitude_tecnica: ScoreItem;
+    qualidade_inferida: ScoreItem;
+  };
+
+  // Preserved for metrics display (computed on the server, not by Groq)
+  _meta?: {
     total_commits: number;
     total_prs: number;
-    total_reviews: number;
     repos_contributed: number;
-    lines_added: number;
-    lines_removed: number;
+    media_semanal: number;
   };
 }
 
