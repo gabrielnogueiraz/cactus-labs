@@ -31,3 +31,17 @@ GITHUB_CLIENT_SECRET="cole_com_cuidado_o_hash_sensivel_visto_aqui"
 ```
 
 Acompanhe os guias em paridade lendo o [README.md](../README.md) sobre o arquivo de base de Variáveis para prosseguir integrando as APIs.
+
+---
+
+### Escopos OAuth solicitados
+
+O Cactus Labs é uma ferramenta **somente de leitura** e solicita apenas os escopos mínimos necessários:
+
+| Escopo | Motivo |
+|--------|--------|
+| `read:user` | Leitura do perfil do usuário (nome, foto, bio) |
+| `user:email` | Acesso ao email do usuário para identificação |
+| `read:org` | Leitura das organizações que o usuário participa |
+
+> **Nota:** O escopo `repo` **não** é solicitado. A API do GitHub permite que o usuário autenticado liste seus próprios repositórios (incluindo privados), commits e pull requests sem esse escopo.

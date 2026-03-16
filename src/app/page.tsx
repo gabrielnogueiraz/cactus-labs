@@ -3,6 +3,7 @@ import { Features } from "@/components/landing/features";
 import { Footer } from "@/components/landing/footer";
 import { Manifesto } from "@/components/landing/manifesto";
 import { Pricing } from "@/components/landing/pricing";
+import { SecuritySection } from "@/components/landing/security-section";
 import { Showcase } from "@/components/landing/showcase";
 import { SocialProof } from "@/components/landing/social-proof";
 import { createClient } from "@/lib/supabase/server";
@@ -49,6 +50,7 @@ export default async function LandingPage() {
         <Manifesto />
       </div>
       <Pricing />
+      <SecuritySection />
       <Footer />
     </main>
   );
