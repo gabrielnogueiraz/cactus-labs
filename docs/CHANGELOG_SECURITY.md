@@ -1,5 +1,13 @@
 # Security Changelog
 
+## [1.0.2] - 2026-03-17
+
+### ✨ Adicionado
+
+- Contador de usuários na hero section
+- Feature showcase interativo com troca de imagens
+- Seção de segurança na landing page
+
 ## [1.0.1] - 2026-03-16
 
 ### 🔒 Segurança
