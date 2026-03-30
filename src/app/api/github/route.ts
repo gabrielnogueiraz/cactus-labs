@@ -5,31 +5,13 @@ import { fetchUser, fetchOrganizations } from "@/lib/github/user";
 import { fetchRepositories } from "@/lib/github/repositories";
 import { fetchCommits } from "@/lib/github/commits";
 import { fetchPullRequests } from "@/lib/github/pull-requests";
+import { getPeriodDate } from "@/lib/github/utils";
 import type { TimePeriod } from "@/types/github";
-
-function getPeriodDate(period: TimePeriod): string {
-  const now = new Date();
-  switch (period) {
-    case "7d":
-      now.setDate(now.getDate() - 7);
-      break;
-    case "30d":
-      now.setDate(now.getDate() - 30);
-      break;
-    case "90d":
-      now.setDate(now.getDate() - 90);
-      break;
-    case "1y":
-      now.setFullYear(now.getFullYear() - 1);
-      break;
-  }
-  return now.toISOString();
-}
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const period = (searchParams.get("period") ?? "30d") as TimePeriod;
+    const period = (searchParams.get("period") as TimePeriod) || "30d";
 
     const supabase = await createClient();
     const {
@@ -43,8 +25,8 @@ export async function GET(request: Request) {
     const accessToken = session.provider_token;
     if (!accessToken) {
       return NextResponse.json(
-        { error: "GitHub token not found. Please re-authenticate." },
-        { status: 401 }
+        { error: "GitHub token not found" },
+        { status: 401 },
       );
     }
 
@@ -58,7 +40,7 @@ export async function GET(request: Request) {
     ]);
 
     const [commits, pullRequests] = await Promise.all([
-      fetchCommits(octokit, user.login, repos, since),
+      fetchCommits(octokit, user.login, since, repos),
       fetchPullRequests(octokit, user.login, repos, since),
     ]);
 

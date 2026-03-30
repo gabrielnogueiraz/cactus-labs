@@ -9,7 +9,7 @@ export async function fetchPullRequests(
 ): Promise<GitHubPullRequest[]> {
   const pullRequests: GitHubPullRequest[] = [];
 
-  const reposToFetch = repos.slice(0, 30);
+  const reposToFetch = repos.slice(0, 50);
 
   const results = await Promise.allSettled(
     reposToFetch.map(async (repo) => {
