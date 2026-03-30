@@ -14,7 +14,7 @@ export function LoginButton({ children, className }: LoginButtonProps) {
       provider: "github",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: "read:user user:email read:org",
+        scopes: "repo read:user user:email read:org",
       },
     });
   };

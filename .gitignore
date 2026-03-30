@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.gemini/
+gha-creds-*.json
+
+# Gemini CLI
+.github/commands/
+.github/workflows/
+
