@@ -5,15 +5,14 @@ import { fetchUser } from "@/lib/github/user";
 import { fetchRepositories } from "@/lib/github/repositories";
 import { fetchCommits } from "@/lib/github/commits";
 import { fetchPullRequests } from "@/lib/github/pull-requests";
-import { analyzePerformance } from "@/lib/groq/analyze";
+import { generateBragQuestions } from "@/lib/groq/analyze";
 import { getPeriodDate, getPeriodLabel } from "@/lib/github/utils";
-import type { TimePeriod, BragAnswer } from "@/types/github";
+import type { TimePeriod } from "@/types/github";
 
 export async function POST(request: Request) {
   try {
-    const { period = "30d", userAnswers = [] } = (await request.json()) as {
+    const { period = "30d" } = (await request.json()) as {
       period?: TimePeriod;
-      userAnswers?: BragAnswer[];
     };
 
     const supabase = await createClient();
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
     if (!accessToken) {
       return NextResponse.json(
         { error: "GitHub token not found" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -46,20 +45,19 @@ export async function POST(request: Request) {
       fetchPullRequests(octokit, user.login, repos, since),
     ]);
 
-    const report = await analyzePerformance(
+    const preAnalysis = await generateBragQuestions(
       commits,
       pullRequests,
       getPeriodLabel(period),
       user.login,
-      userAnswers.length > 0 ? userAnswers : undefined,
     );
 
-    return NextResponse.json({ report });
+    return NextResponse.json({ preAnalysis });
   } catch (error) {
-    console.error("AI report error:", error);
+    console.error("Pre-analysis error:", error);
     return NextResponse.json(
-      { error: "Failed to generate AI report" },
-      { status: 500 },
+      { error: "Failed to generate pre-analysis questions" },
+      { status: 500 }
     );
   }
 }
