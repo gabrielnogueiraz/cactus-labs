@@ -170,4 +170,33 @@ export interface AIReportData {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Brag Document — contextual questions system
+// ---------------------------------------------------------------------------
+
+export type BragQuestionType = "sim_nao" | "texto_curto" | "multipla_escolha";
+
+export interface BragQuestion {
+  id: string;
+  texto: string;
+  tipo: BragQuestionType;
+  opcoes?: string[];
+  contexto: string;
+}
+
+export interface BragAnswer {
+  questionId: string;
+  value: string;
+}
+
+export interface BragPreAnalysis {
+  perguntas: BragQuestion[];
+  github_summary: {
+    total_commits: number;
+    total_prs: number;
+    repos_contributed: number;
+    top_repos: string[];
+  };
+}
+
 export type TimePeriod = "7d" | "30d" | "90d" | "1y";

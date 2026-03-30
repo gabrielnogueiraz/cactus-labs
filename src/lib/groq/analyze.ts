@@ -3,6 +3,9 @@ import type {
   GitHubCommit,
   GitHubPullRequest,
   AIReportData,
+  BragQuestion,
+  BragAnswer,
+  BragPreAnalysis,
 } from "@/types/github";
 
 const groq = new Groq({
@@ -67,6 +70,109 @@ function calcularMedia(semanas: WeekBucket[]): number {
 }
 
 // ---------------------------------------------------------------------------
+// Brag Document — pre-analysis question generation
+// ---------------------------------------------------------------------------
+
+export async function generateBragQuestions(
+  commits: GitHubCommit[],
+  pullRequests: GitHubPullRequest[],
+  period: string,
+  username: string,
+): Promise<BragPreAnalysis> {
+  const commitsPorRepo = agruparCommitsPorRepositorio(commits);
+
+  const totalRepos = new Set([
+    ...commits.map((c) => c.repo),
+    ...pullRequests.map((pr) => pr.repo),
+  ]).size;
+
+  const prData = pullRequests.slice(0, 15).map((pr) => ({
+    titulo: pr.title,
+    repo: pr.repo,
+    status: pr.state,
+    merged: pr.merged_at ? true : false,
+  }));
+
+  const systemPrompt = `Você é um assistente que ajuda desenvolvedores a documentar seu impacto profissional.
+Analise a atividade do GitHub abaixo e gere de 3 a 5 perguntas ESPECÍFICAS e CONTEXTUAIS para entender o impacto real do trabalho.
+
+Regras:
+- Máximo 5 perguntas — respeite o tempo do usuário
+- Cada pergunta deve referenciar algo REAL dos dados (commit, PR, repo, número específico)
+- Mix de tipos: algumas sim_nao, algumas texto_curto, algumas multipla_escolha
+- Foque no que a IA NÃO consegue inferir sozinha:
+  • Impacto de negócio (reduziu custo? acelerou processo?)
+  • Contexto organizacional (entrega de projeto? sprint? hackathon?)
+  • Resultado para o usuário final (resolve dor real? quantos impactados?)
+  • Colaboração (liderou? trabalho solo? mentoria?)
+- Não pergunte o que já está nos dados (ex: "quantos commits?", "quais repos?")
+- Perguntas devem ser conversacionais e diretas, não burocráticas
+- Para multipla_escolha, forneça 3-4 opções relevantes
+
+Responda APENAS com JSON válido, sem texto antes ou depois, sem markdown:
+{
+  "perguntas": [
+    {
+      "id": "q1",
+      "texto": "pergunta específica aqui",
+      "tipo": "sim_nao" | "texto_curto" | "multipla_escolha",
+      "opcoes": ["opção 1", "opção 2"],
+      "contexto": "qual dado do GitHub motivou essa pergunta"
+    }
+  ]
+}`;
+
+  const userPrompt = `Desenvolvedor: ${username} | Período: ${period} | Total commits: ${commits.length} | Total PRs: ${pullRequests.length} | Repos ativos: ${totalRepos}
+
+## COMMITS POR REPOSITÓRIO (top 5)
+${JSON.stringify(commitsPorRepo)}
+
+## PULL REQUESTS (amostra)
+${JSON.stringify(prData)}
+
+Gere perguntas contextuais baseadas nesses dados REAIS.`;
+
+  const completion = await groq.chat.completions.create({
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    model: "openai/gpt-oss-120b",
+    temperature: 0.5,
+    max_tokens: 2000,
+  });
+
+  const content = completion.choices[0]?.message?.content ?? "";
+
+  let perguntas: BragQuestion[] = [];
+
+  try {
+    const parsed = JSON.parse(content) as { perguntas: BragQuestion[] };
+    perguntas = parsed.perguntas ?? [];
+  } catch {
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[0]) as { perguntas: BragQuestion[] };
+        perguntas = parsed.perguntas ?? [];
+      } catch {
+        perguntas = [];
+      }
+    }
+  }
+
+  return {
+    perguntas,
+    github_summary: {
+      total_commits: commits.length,
+      total_prs: pullRequests.length,
+      repos_contributed: totalRepos,
+      top_repos: commitsPorRepo.map((r) => r.repo),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Main analysis function
 // ---------------------------------------------------------------------------
 
@@ -75,6 +181,7 @@ export async function analyzePerformance(
   pullRequests: GitHubPullRequest[],
   period: string,
   username: string,
+  userAnswers?: BragAnswer[],
 ): Promise<AIReportData> {
   // --- Pre-processing ---
   const commitsPorRepo = agruparCommitsPorRepositorio(commits);
@@ -119,12 +226,49 @@ export async function analyzePerformance(
   ]).size;
 
   // --- Prompt building ---
-  const systemPrompt = `Você é um Engineering Manager sênior com 15 anos de experiência avaliando performance técnica de desenvolvedores. Sua função é analisar dados de atividade do GitHub e produzir um relatório executivo honesto — não um elogio, uma análise.
+  const systemPrompt = `Você é um Engineering Manager sênior com 15 anos de experiência avaliando performance técnica de desenvolvedores. Sua função é analisar dados de atividade do GitHub e produzir um relatório executivo justo e construtivo.
 
-Seja direto, específico e baseado apenas nos dados fornecidos.
+Seja direto, específico e baseado nos dados fornecidos.
 Nunca invente informações. Se não há evidência, não afirme.
 
 IMPORTANTE sobre o resumo_executivo: cada um dos 3 campos deve conter 2 a 3 frases claras e diretas. Seja didático e contextualizado — cite exemplos concretos dos dados e explique brevemente o porquê das conclusões. Não seja genérico nem superficial, mas também não se estenda demais.
+
+## REGRAS DE SCORING (0-10) — siga rigorosamente:
+
+### Produtividade (volume de entrega no período):
+- 1-20 commits → 3-4
+- 21-50 commits → 5-6
+- 51-100 commits → 6-7
+- 101-200 commits → 7-8
+- 201-400 commits → 8-9
+- 400+ commits → 9-10
+Ajuste para cima se houver PRs mergeados. Ajuste para baixo apenas se os commits forem triviais (só typos, configs).
+
+### Consistência (regularidade ao longo do período):
+- Avalie com base na distribuição semanal. Se o dev teve commits na maioria das semanas, é consistente.
+- Variação semanal é NORMAL e não deve penalizar. Penalize apenas se houver semanas inteiras sem atividade.
+- Não penalize ausência de PRs — muitos devs trabalham com trunk-based development ou push direto.
+- Mediana de commits/semana > 5 → mínimo 6
+
+### Amplitude Técnica (diversidade de atuação):
+- 1 repo → 3-4
+- 2-3 repos → 5-6
+- 4-5 repos → 7-8
+- 6+ repos → 8-9
+Ajustar para cima se as mensagens de commit indicam trabalho em áreas diversas (frontend, backend, devops, IA, etc).
+
+### Qualidade Inferida (sinais de qualidade no que é visível):
+- Mensagens de commit descritivas e claras = bom sinal (+2)
+- PRs com descrição e revisão = bom sinal (+1)
+- Baixo percentual de mensagens vagas (< 10%) = bom sinal (+1)
+- Não penalize ausência de testes ou arquitetura — esses dados NÃO estão disponíveis.
+- Não penalize ausência de PRs — pode ser workflow da equipe.
+- Base: comece em 5 e ajuste para cima/baixo com os sinais acima.
+
+## IMPORTANTE:
+- Os scores devem refletir o que está NOS DADOS, não o que está faltando.
+- Na dúvida entre duas notas, escolha a MAIOR.
+- 544 commits em um período é excepcional. 100+ commits é muito bom. Scores abaixo de 5 são para atividade realmente baixa.
 
 Responda APENAS com JSON válido, sem texto antes ou depois, sem markdown.`;
 
@@ -133,6 +277,15 @@ Responda APENAS com JSON válido, sem texto antes ou depois, sem markdown.`;
     status: pr.state,
     merged: pr.merged_at ? true : false,
   }));
+
+  // Build user answers context block
+  let answersBlock = "";
+  if (userAnswers && userAnswers.length > 0) {
+    answersBlock = `\n\n## CONTEXTO DO DESENVOLVEDOR (respostas fornecidas pelo próprio dev)
+${userAnswers.map((a) => `- ${a.questionId}: ${a.value}`).join("\n")}
+
+IMPORTANTE: Use as respostas do desenvolvedor para enriquecer a análise. Faça afirmações contextualizadas sobre impacto de negócio, resultados para o usuário final e contexto organizacional com base nessas respostas. Isso é o diferencial deste relatório.`;
+  }
 
   const userPrompt = `Desenvolvedor: ${username} | Período: ${period} | Commits: ${commits.length} | PRs: ${pullRequests.length} | Repos: ${totalRepos}
 
@@ -143,7 +296,7 @@ ${JSON.stringify(commitsPorRepo)}
 ${JSON.stringify(prData)}
 
 ## MÉTRICAS
-Média semanal: ${mediaSemanal} | Pico: ${semanaPico.label}(${semanaPico.total}) | Vale: ${semanaVale.label}(${semanaVale.total}) | Ratio feat/fix: ${ratioFixFeature} | Msgs vagas: ${percentualVago}%
+Média semanal: ${mediaSemanal} | Pico: ${semanaPico.label}(${semanaPico.total}) | Vale: ${semanaVale.label}(${semanaVale.total}) | Ratio feat/fix: ${ratioFixFeature} | Msgs vagas: ${percentualVago}%${answersBlock}
 
 Responda com JSON nesta estrutura exata:
 {"resumo_executivo":{"o_que_foi_construido":"str","padroes_de_comportamento":"str","avaliacao_de_maturidade":"str"},"destaques":[{"titulo":"str","descricao":"str","impacto_inferido":"str","evidencia":"str"}],"pontos_criticos":[{"observacao":"str","evidencia":"str","recomendacao":"str"}],"padroes_identificados":{"ritmo_de_trabalho":"str","foco_tecnico":"str","lacunas":"str","evolucao_no_periodo":"str"},"tecnologias":["str"],"areas_de_impacto":["str"],"recomendacoes":[{"prioridade":"Alta|Média|Baixa","acao":"str","justificativa":"str"}],"scores":{"produtividade":{"nota":0,"justificativa":"str"},"consistencia":{"nota":0,"justificativa":"str"},"amplitude_tecnica":{"nota":0,"justificativa":"str"},"qualidade_inferida":{"nota":0,"justificativa":"str"}}}`;
