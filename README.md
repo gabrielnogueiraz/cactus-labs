@@ -12,10 +12,10 @@ Conecte-se com o GitHub via OAuth, acompanhe suas métricas de commits e PRs e o
 
 ## ✨ Funcionalidades
 
-- 📊 **Dashboard de Métricas:** Acompanhe commits, PRs e atividades em tempo real.
-- 🤖 **Análise com IA:** Insights e relatórios de performance gerados pelas IAs Groq e gpt-oss-120b.
-- 📥 **Exportação de Relatórios:** Exporte seus dados em PDF e Excel facilmente.
-- 🔐 **OAuth GitHub:** Autenticação segura e unificada utilizando sua conta do GitHub via Supabase.
+- 📊 **Dashboard de Métricas:** Acompanhe commits, PRs e atividades em tempo real, agora com suporte a organizações e repositórios privados.
+- 📝 **Brag Document System:** Novo sistema de pré-análise que gera perguntas contextuais via IA para enriquecer seu relatório de impacto.
+- 🤖 **Análise com IA:** Insights profundos gerados pela Groq Cloud utilizando o modelo `gpt-oss-120b`.
+- 🔐 **OAuth GitHub:** Autenticação segura com suporte opcional a repositórios privados para uma análise de performance completa.
 - 🌓 **Tema Claro/Escuro:** Interface moderna com suporte nativo a temas utilizando shadcn/ui.
 - 🗺️ **Heatmap de Contribuições:** Visualização de atividade estilo GitHub.
 
